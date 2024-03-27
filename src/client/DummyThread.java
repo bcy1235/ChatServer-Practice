@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.tools.Tool;
 import java.awt.*;
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -16,22 +17,27 @@ public class DummyThread implements Runnable {
     private final int SERVER_PORT;
     private final int BUF_SIZE;
     private final int BYTE_SEC;
+    private final int CLIENT_PORT;
 
-    DummyThread(String serverIp, int serverPort, int bufSize, int byteSec) {
+    DummyThread(String serverIp, int serverPort, int bufSize, int byteSec, int clientPort) {
         this.SERVER_IP = serverIp;
         this.SERVER_PORT = serverPort;
         this.BUF_SIZE = bufSize;
         this.BYTE_SEC = byteSec;
+        this.CLIENT_PORT = clientPort;
     }
 
     @Override
     public void run() {
         try {
-            SocketChannel socketChannel = new Socket(SERVER_IP, SERVER_PORT).getChannel();
+            SocketChannel socketChannel = SocketChannel.open();
+            socketChannel.bind(new InetSocketAddress(SERVER_IP, CLIENT_PORT));
+            socketChannel.connect(new InetSocketAddress(SERVER_IP, SERVER_PORT));
             socketChannel.configureBlocking(false);
 
             Thread writing = new Thread(new WritingThread(socketChannel, BUF_SIZE, BYTE_SEC));
             Thread reading = new Thread(new ReadingThread(socketChannel, BUF_SIZE));
+
 
             writing.start();
             reading.start();
@@ -66,26 +72,9 @@ public class DummyThread implements Runnable {
         public void run() {
             try {
                 TextArea textArea = createBasicGUI();
-                Selector selector = Selector.open();
-                socketChannel.register(selector, SelectionKey.OP_READ);
 
                 while (true) {
-                    Set<SelectionKey> selectionKeys = selector.selectedKeys();
-                    if (!selectionKeys.isEmpty()) {
-                        int readByte = 0;
-                        while (readByte < 2) {
-                            readByte += socketChannel.read(readBuffer);
-                        }
-
-                        byte front = readBuffer.get();
-                        byte back = readBuffer.get();
-                        int messageLen = ((front & 0xFF) << 8) | (back & 0xFF);
-                        while (readByte < messageLen + 2) {
-                            readByte += socketChannel.read(readBuffer);
-                        }
-
-                        messageResolve(textArea, messageLen);
-                    }
+                    messageResolve(textArea);
                 }
             } catch (IOException e) {
                 System.out.println("Reading Thread Throw Exception! : " + e);
@@ -95,9 +84,8 @@ public class DummyThread implements Runnable {
 
         public TextArea createBasicGUI() {
             JFrame jFrame = new JFrame();
-            jFrame.setLocation((int) (Math.random() * (Toolkit.getDefaultToolkit().getScreenSize().width - SCREEN_SIZE_WIDTH))
-                    , (int) (Math.random() * (Toolkit.getDefaultToolkit().getScreenSize().height - SCREEN_SIZE_HEIGHT)));
             jFrame.setSize(BASICGUI_WIDTH, BASICGUI_HEIGHT);
+            jFrame.setLocationByPlatform(true);
 
             TextArea textArea = new TextArea();
             JScrollPane scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -108,14 +96,34 @@ public class DummyThread implements Runnable {
             return textArea;
         }
 
-        public int messageResolve(TextArea textArea, int messageLen) throws IOException {
+        public void messageResolve(TextArea textArea) throws IOException {
+            int readByte = 0;
+            while (readByte < 2) {
+                int readSize = socketChannel.read(readBuffer);
+                if (readSize == 0 && readBuffer.position() > 1)
+                    break;
+                readByte += readSize;
+            }
+            readBuffer.flip();
+
+            byte front = readBuffer.get();
+            byte back = readBuffer.get();
+            int messageLen = ((front & 0xFF) << 8) | (back & 0xFF);
+            readBuffer.compact();
+            while (readByte < messageLen + 2) {
+                int readSize = socketChannel.read(readBuffer);
+                if (readSize == 0)
+                    break;
+                readByte += socketChannel.read(readBuffer);
+            }
+            readBuffer.flip();
+
             StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < messageLen + 2; i++) {
+            for (int i = 0; i < messageLen; i++) {
                 stringBuilder.append((char) readBuffer.get());
             }
             textArea.append(stringBuilder.append('\n').toString());
             readBuffer.compact();
-            return messageLen;
         }
     }
 
