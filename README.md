@@ -59,3 +59,5 @@
 
 https://github.com/bcy1235/ChatServer-Practice/assets/96825479/c88caeb2-d2d6-405d-9488-d63ad2e17385
 
+아직 멀티쓰레드 적용전인, 싱글쓰레드 버전 예시입니다.
+
