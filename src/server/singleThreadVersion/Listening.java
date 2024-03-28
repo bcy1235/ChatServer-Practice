@@ -15,7 +15,7 @@ import java.nio.channels.SocketChannel;
 public class Listening {
     private static final String SERVER_IP = "127.0.0.1";
     private static int SERVER_PORT = 40000;
-    private static int BUF_SIZE = 5000;
+    private static int BUF_SIZE = 3000;
     public static void main(String[] args) {
         try {
             ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
