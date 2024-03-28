@@ -56,6 +56,6 @@
 
 ### 서버 및 클라 동작 예시
 
-![image](https://github.com/bcy1235/ChatServer-Practice/assets/96825479/005476f9-ec59-45c8-a4f3-fcd4ea3d2a9f)
 
+https://github.com/bcy1235/ChatServer-Practice/assets/96825479/c88caeb2-d2d6-405d-9488-d63ad2e17385
 
