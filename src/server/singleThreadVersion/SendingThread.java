@@ -33,7 +33,7 @@ public class SendingThread implements Runnable {
                 if (message == null)
                     continue;
 
-                sendingMessage(socketChannel, message);
+                sendingMessage(message);
             }
         }
     }
@@ -78,11 +78,16 @@ public class SendingThread implements Runnable {
         return null;
     }
 
-    public void sendingMessage(SocketChannel socketChannel, ByteBuffer message) {
+    public void sendingMessage(ByteBuffer message) {
         try {
             Iterator<SocketChannel> iterator = SocketStation.getSocketList().iterator();
             while (iterator.hasNext()) {
-                iterator.next().write(message);
+                SocketChannel socketChannel = iterator.next();
+
+                int writeBytes = 0;
+                while (writeBytes < message.limit())
+                    writeBytes += socketChannel.write(message);
+
                 message.rewind();
             }
         } catch (IOException e) {
