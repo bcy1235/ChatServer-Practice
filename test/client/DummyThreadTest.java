@@ -28,7 +28,7 @@ class DummyThreadTest {
     }
     @Test
     public void testMessageResolver() throws IOException {
-        DummyThread.ReadingThread readingThread = new DummyThread.ReadingThread(null, BUF_SIZE);
+        DummyThread.ReadingThread readingThread = new DummyThread.ReadingThread(null, BUF_SIZE, 1);
         DummyThread.WritingThread writingThread = new DummyThread.WritingThread(null, BUF_SIZE, BYTE_SEC);
 
 
