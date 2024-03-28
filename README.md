@@ -52,3 +52,10 @@
 ---
 
 위 내용은 프로젝트 본격적인 시작 전 구상 내용이며, 아래부터 본격적인 프로젝트 진행 과정을 설명합니다.
+
+
+### 서버 및 클라 동작 예시
+
+![image](https://github.com/bcy1235/ChatServer-Practice/assets/96825479/005476f9-ec59-45c8-a4f3-fcd4ea3d2a9f)
+
+
