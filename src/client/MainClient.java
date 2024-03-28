@@ -8,9 +8,13 @@ public class MainClient {
         ProcessBuilder processBuilder = new ProcessBuilder();
 
         processBuilder.command("java", "client.DummyProcess");
-        processBuilder.directory(new File("out\\production\\ChatServer-Practice"));
+        processBuilder.directory(new File("C:\\project\\ChatServer-Practice\\out\\production\\ChatServer-Practice"));
         Process process = processBuilder.start();
 
-        process.waitFor();
+
+        while (System.in.read() == 0) {
+
+        }
+        process.destroy();
     }
 }
