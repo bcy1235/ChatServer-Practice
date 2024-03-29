@@ -5,10 +5,11 @@ public class DummyProcess {
     private static final int THREAD_NUM = 5;
     private static final int BUF_SIZE = 15_000;
     // byte/sec : message sending rate per each DummyThread
-    private static final int BYTE_SEC = 2000;
+    private static final int BYTE_SEC = 1024;
     public static void main(String[] args) throws InterruptedException {
-        for (int i = 0; i < THREAD_NUM; i++) {
-            new Thread(new DummyThread(SERVER_IP, SERVER_PORT, BUF_SIZE, BYTE_SEC, 12222 + i, i)).start();
+        int processNumber = Integer.parseInt(args[0]);
+        for (int i = processNumber * THREAD_NUM; i < processNumber * THREAD_NUM + THREAD_NUM; i++) {
+            new Thread(new DummyThread(SERVER_IP, SERVER_PORT, BUF_SIZE, BYTE_SEC, 10000 + i, i)).start();
         }
 
         synchronized (Thread.currentThread()) {

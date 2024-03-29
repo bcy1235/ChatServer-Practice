@@ -42,11 +42,11 @@ public class SendingThread implements Runnable {
         ByteBuffer buffer = SocketBuffer.getBuffer(socketChannel);
         try {
             int readBytes = 0;
-            while (readBytes < 2) {
+            while (readBytes < 4) {
                 int readSize = socketChannel.read(buffer);
 
-                // skip to reading 2 bytes procedure
-                if (readSize == 0 && buffer.position() > 1) {
+                // skip to reading 4 bytes procedure
+                if (buffer.position() == buffer.limit()) {
                     break;
                 } else if (readSize == -1) {
                     closeAll(socketChannel);
@@ -55,13 +55,13 @@ public class SendingThread implements Runnable {
                 readBytes += readSize;
             }
 
-            // Message's first two bytes represent message's payload size
-            int messageSize = ((buffer.get(0) & 0xFF) << 8) | (buffer.get(1) & 0xFF);
-            while (readBytes < messageSize + 2) {
+            // Message's 3rd and 4th bytes represent message's payload size
+            int messageSize = ((buffer.get(2) & 0xFF) << 8) | (buffer.get(3) & 0xFF);
+            while (readBytes < messageSize + 4) {
                 int readSize = socketChannel.read(buffer);
 
                 // skip to reading message payload
-                if (readSize == 0 && buffer.position() > 1) {
+                if (buffer.position() == buffer.limit()) {
                     break;
                 } else if (readSize == -1) {
                     closeAll(socketChannel);
