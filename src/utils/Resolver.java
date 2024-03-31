@@ -1,4 +1,4 @@
-package server.utils;
+package utils;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;

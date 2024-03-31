@@ -1,4 +1,4 @@
-package server.utils;
+package server.singleThreadVersion;
 
 
 import java.io.IOException;
@@ -52,14 +52,15 @@ public class SocketStation {
      */
     public static Set<SelectionKey> getValidKey() {
         try {
-            while (selector.selectNow() == 0){
-                return selector.selectedKeys();
+            synchronized (stationLock) {
+                while (selector.selectNow() != 0) {
+                    return selector.selectedKeys();
+                }
             }
         } catch (IOException e) {
             // have to change with logger
             System.out.println("SocketStation getValidKey method : " + e);
         }
-        // unexpected situation
         return null;
     }
 
@@ -67,7 +68,9 @@ public class SocketStation {
      * @return SocketChannel List
      */
     public static List<SocketChannel> getSocketList() {
-        return list;
+        synchronized (stationLock) {
+            return List.copyOf(list);
+        }
     }
 
     /**

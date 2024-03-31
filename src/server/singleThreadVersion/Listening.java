@@ -1,8 +1,5 @@
 package server.singleThreadVersion;
 
-import server.utils.SocketBuffer;
-import server.utils.SocketStation;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
@@ -26,8 +23,8 @@ public class Listening {
                 SocketChannel connectedChannel = serverSocketChannel.accept();
                 connectedChannel.configureBlocking(false);
 
-                SocketStation.register(connectedChannel);
                 SocketBuffer.insert(connectedChannel, BUF_SIZE);
+                SocketStation.register(connectedChannel);
             }
         } catch (IOException e) {
             // have to change with logger

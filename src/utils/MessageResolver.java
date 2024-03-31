@@ -1,12 +1,15 @@
-package server.utils;
+package utils;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 /**
  * class which helps resolve message
  */
 public class MessageResolver implements Resolver {
+
+    /**
+     * return new buffer with parameter buffer's index 0 ~ (messageLen - 1) + (defined by protocol)
+     */
     @Override
     public ByteBuffer resolve(ByteBuffer buffer, int messageLen) {
         int actualLength = ((buffer.get(2) & 0xFF) << 8) | (buffer.get(3) & 0xFF);

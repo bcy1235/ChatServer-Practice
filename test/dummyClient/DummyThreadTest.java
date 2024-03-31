@@ -1,13 +1,4 @@
-package client;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
-import java.net.Socket;
-import java.nio.ByteBuffer;
+package dummyClient;
 
 class DummyThreadTest {
 //    private static final String SERVER_IP = "127.0.0.1";
@@ -16,7 +7,7 @@ class DummyThreadTest {
 //    private static final int BYTE_SEC = 100;
 //    @Test
 //    public void testFillBuffer() throws IOException {
-//        DummyThread.WritingThread writingThread = new DummyThread.WritingThread(null, BUF_SIZE, BYTE_SEC);
+//        MainClient.WritingThread writingThread = new MainClient.WritingThread(null, BUF_SIZE, BYTE_SEC);
 //
 //        int testLen = 1024;
 //        int len = writingThread.fillBuffer(testLen);
@@ -28,8 +19,8 @@ class DummyThreadTest {
 //    }
 //    @Test
 //    public void testMessageResolver() throws IOException {
-//        DummyThread.ReadingThread readingThread = new DummyThread.ReadingThread(null, BUF_SIZE, 1);
-//        DummyThread.WritingThread writingThread = new DummyThread.WritingThread(null, BUF_SIZE, BYTE_SEC);
+//        MainClient.ReadingThread readingThread = new MainClient.ReadingThread(null, BUF_SIZE, 1);
+//        MainClient.WritingThread writingThread = new MainClient.WritingThread(null, BUF_SIZE, BYTE_SEC);
 //
 //
 //    }

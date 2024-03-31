@@ -1,4 +1,4 @@
-package server.utils;
+package server.singleThreadVersion;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -16,7 +16,7 @@ public class SocketBuffer {
      * @param socketChannel key value
      * @param bufSize ByteBuffer's size which owned by SocketChannel
      */
-    public static void insert(SocketChannel socketChannel, int bufSize) {
+    public static synchronized void insert(SocketChannel socketChannel, int bufSize) {
         map.put(socketChannel, ByteBuffer.allocate(bufSize));
     }
 
@@ -25,7 +25,7 @@ public class SocketBuffer {
      * @param socketChannel owner of ByteBuffer
      * @return socketChannel's ByteBuffer
      */
-    public static ByteBuffer getBuffer(SocketChannel socketChannel) {
+    public static synchronized ByteBuffer getBuffer(SocketChannel socketChannel) {
         return map.get(socketChannel);
     }
 
@@ -34,7 +34,7 @@ public class SocketBuffer {
      * @param socketChannel socketChannel which will be deleted from SocketBuffer
      * @return if socketChannel is in the SocketBuffer, return true, else false
      */
-    public static boolean delete(SocketChannel socketChannel) {
+    public static synchronized boolean delete(SocketChannel socketChannel) {
         if (map.remove(socketChannel) != null)
             return true;
         else

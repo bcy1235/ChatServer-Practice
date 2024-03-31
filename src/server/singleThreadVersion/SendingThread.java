@@ -1,10 +1,8 @@
 package server.singleThreadVersion;
 
 
-import server.utils.MessageResolver;
-import server.utils.Resolver;
-import server.utils.SocketBuffer;
-import server.utils.SocketStation;
+import utils.MessageResolver;
+import utils.Resolver;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -28,54 +26,38 @@ public class SendingThread implements Runnable {
             Iterator<SelectionKey> iterator = validKey.iterator();
             while (iterator.hasNext()) {
                 SocketChannel socketChannel = (SocketChannel) iterator.next().channel();
+                iterator.remove();
 
-                ByteBuffer message = readingMessage(socketChannel);
-                if (message == null)
-                    continue;
-
-                sendingMessage(message);
+               processingMessage(socketChannel);
             }
         }
     }
 
-    public ByteBuffer readingMessage(SocketChannel socketChannel) {
+    public void processingMessage(SocketChannel socketChannel) {
         ByteBuffer buffer = SocketBuffer.getBuffer(socketChannel);
-        try {
-            int readBytes = 0;
-            while (readBytes < 4) {
-                int readSize = socketChannel.read(buffer);
-
-                // skip to reading 4 bytes procedure
-                if (buffer.position() == buffer.limit()) {
-                    break;
-                } else if (readSize == -1) {
+        while (true) {
+            try {
+                int readBytes = socketChannel.read(buffer);
+                if (readBytes == -1) {
                     closeAll(socketChannel);
-                    return null;
+                    return;
                 }
-                readBytes += readSize;
-            }
+                else if (buffer.position() < 4)
+                    return;
 
-            // Message's 3rd and 4th bytes represent message's payload size
-            int messageSize = ((buffer.get(2) & 0xFF) << 8) | (buffer.get(3) & 0xFF);
-            while (readBytes < messageSize + 4) {
-                int readSize = socketChannel.read(buffer);
+                // Message's 3rd and 4th bytes represent message's payload size
+                int messageSize = ((buffer.get(2) & 0xFF) << 8) | (buffer.get(3) & 0xFF);
+                if (buffer.position() < messageSize + 4)
+                    return;
 
-                // skip to reading message payload
-                if (buffer.position() == buffer.limit()) {
-                    break;
-                } else if (readSize == -1) {
-                    closeAll(socketChannel);
-                    return null;
-                }
-                readBytes += readSize;
+                sendingMessage(messageResolver.resolve(buffer.flip(), messageSize));
+            } catch (IOException e) {
+                // have to change with logger
+                System.out.println("SendingThread readingMessage method : " + e);
+                closeAll(socketChannel);
+                return;
             }
-            return messageResolver.resolve(buffer.flip(), messageSize);
-        } catch (IOException e) {
-            // have to change with logger
-            System.out.println("SendingThread readingMessage method : " + e);
-            closeAll(socketChannel);
         }
-        return null;
     }
 
     public void sendingMessage(ByteBuffer message) {

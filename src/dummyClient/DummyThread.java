@@ -1,19 +1,14 @@
-package client;
+package dummyClient;
 
-import server.utils.MessageResolver;
-import server.utils.Resolver;
+import utils.MessageResolver;
+import utils.Resolver;
 
 import javax.swing.*;
-import javax.tools.Tool;
 import java.awt.*;
 import java.io.*;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Set;
 
 public class DummyThread implements Runnable {
     private final String SERVER_IP;
@@ -49,9 +44,9 @@ public class DummyThread implements Runnable {
             writing.join();
             reading.join();
         } catch (IOException e) {
-            System.out.println("DummyThread fail to create socket! : " + e);
+            System.out.println("MainClient fail to create socket! : " + e);
         } catch (InterruptedException e) {
-            System.out.println("DummyThread get interrupted! : " + e);
+            System.out.println("MainClient get interrupted! : " + e);
         }
     }
 
@@ -101,25 +96,17 @@ public class DummyThread implements Runnable {
 
         public void messageResolve(TextArea textArea) {
             try {
-                int readBytes = 0;
-                while (readBytes < 4) {
-                    int readSize = socketChannel.read(readBuffer);
-                    if (readBuffer.position() == readBuffer.limit())
-                        break;
-                    readBytes += readSize;
-                }
+                int readBytes = socketChannel.read(readBuffer);
+                if (readBuffer.position() < 4)
+                    return;
 
                 int messageLen = ((readBuffer.get(2) & 0xFF) << 8) | (readBuffer.get(3) & 0xFF);
-                while (readBytes < messageLen + 4) {
-                    int readSize = socketChannel.read(readBuffer);
-                    if (readBuffer.position() == readBuffer.limit())
-                        break;
-                    readBytes += readSize;
-                }
+               if (readBuffer.position() < messageLen + 4)
+                   return;
 
                 renderingMessage(textArea, messageLen);
             } catch (IOException e) {
-                System.out.println("DummyThread's readThread's messageResolve method : " + e);
+                System.out.println("MainClient's readThread's messageResolve method : " + e);
             }
         }
 
@@ -127,13 +114,12 @@ public class DummyThread implements Runnable {
             ByteBuffer write = resolver.resolve(readBuffer.flip(), messageLen);
 
             byte[] array = write.array();
-
             int messageOwner = ((array[0] & 0xFF) << 8) + (array[1] & 0xFF);
 
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("Thread" + messageOwner + ": ");
             for (int i = 4; i < messageLen + 4; i++) {
-                stringBuilder.append((char)array[i]);
+                stringBuilder.append((char) array[i]);
             }
             stringBuilder.append('\n');
             textArea.append(stringBuilder.toString());
@@ -157,14 +143,14 @@ public class DummyThread implements Runnable {
         public void run() {
             try {
                 int remainBytes = BYTE_SEC;
-                long destTime = System.currentTimeMillis() + 1000;
+                long destTime = System.currentTimeMillis() + 200;
                 while (true) {
                     if (System.currentTimeMillis() > destTime) {
-                        destTime += 1000;
+                        destTime += 200;
                         remainBytes = BYTE_SEC;
                     }
                     if (remainBytes > 0) {
-                        int size = fillBuffer((int) (Math.random() * remainBytes));
+                        int size = fillBuffer(remainBytes);
                         writeBuffer.flip();
 
                         int writeByte = 0;
