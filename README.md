@@ -52,3 +52,19 @@ Count : 67<br>
 MaxTime : 0.566161(sec)<br>
 MinTime : 0.175369(sec)<br>
 Average : 0.337359(sec)<br><br>
+
+
+- 프로세스 5개 / 프로세스당 쓰레드 50개 / 1초당 104Bytes 전송<br>
+
+https://github.com/bcy1235/ChatServer-Practice/assets/96825479/ae664a9c-9bf2-4752-9a60-ce87ebc91593
+
+##### (결과)<br>
+Sum : 134.552401(sec)<br>
+Count : 49<br>
+MaxTime : 7.015459(sec)<br>
+MinTime : 0.008106(sec)<br>
+Average : 2.745967(sec)<br><br>
+
+평균 응답시간이 1초가 넘어감으로, 싱글쓰레드 서버의 한계는 이정도라고 볼 수 있을 것 같습니다. 멀티쓰레드 서버 구조로 개선하여, 한번 비교 해보겠습니다.
+
+---
