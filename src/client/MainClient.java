@@ -90,13 +90,18 @@ public class MainClient {
                 while (true) {
                     int readBytes = socketChannel.read(readBuffer);
                     if (readBuffer.position() < 4)
-                        return;
+                        continue;
 
+                    readBuffer.flip();
                     byte front = readBuffer.get();
                     byte back = readBuffer.get();
+                    readBuffer.flip();
+
                     int messageLen = ((front & 0xFF) << 8) | (back & 0xFF);
-                    if (readBuffer.position() < messageLen + 4)
-                        return;
+                    if (readBuffer.position() < messageLen + 4) {
+                        readBuffer.rewind();
+                        continue;
+                    }
 
                     renderingMessage(textArea, messageLen);
                 }
