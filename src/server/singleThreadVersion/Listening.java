@@ -2,6 +2,7 @@ package server.singleThreadVersion;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
@@ -10,7 +11,6 @@ import java.nio.channels.SocketChannel;
  */
 
 public class Listening {
-    private static final String SERVER_IP = "127.0.0.1";
     private static int SERVER_PORT = 40000;
     private static int BUF_SIZE = 3000;
     public static void main(String[] args) {
@@ -19,6 +19,7 @@ public class Listening {
             serverSocketChannel.socket().bind(new InetSocketAddress(SERVER_PORT));
             new Thread(new SendingThread()).start();
             // actual listening part
+
             while (true) {
                 SocketChannel connectedChannel = serverSocketChannel.accept();
                 connectedChannel.configureBlocking(false);

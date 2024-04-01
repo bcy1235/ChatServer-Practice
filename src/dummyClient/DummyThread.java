@@ -14,15 +14,15 @@ public class DummyThread implements Runnable {
     private final String SERVER_IP;
     private final int SERVER_PORT;
     private final int BUF_SIZE;
-    private final int BYTE_SEC;
+    private final int SENDING_RATE;
     private final int CLIENT_PORT;
     private final int threadNum;
 
-    DummyThread(String serverIp, int serverPort, int bufSize, int byteSec, int clientPort, int threadNum) {
+    DummyThread(String serverIp, int serverPort, int bufSize, int sendingRate, int clientPort, int threadNum) {
         this.SERVER_IP = serverIp;
         this.SERVER_PORT = serverPort;
         this.BUF_SIZE = bufSize;
-        this.BYTE_SEC = byteSec;
+        this.SENDING_RATE = sendingRate;
         this.CLIENT_PORT = clientPort;
         this.threadNum = threadNum;
     }
@@ -35,14 +35,14 @@ public class DummyThread implements Runnable {
             socketChannel.connect(new InetSocketAddress(SERVER_IP, SERVER_PORT));
             socketChannel.configureBlocking(false);
 
-            Thread writing = new Thread(new WritingThread(socketChannel, BUF_SIZE, BYTE_SEC, threadNum));
-            Thread reading = new Thread(new ReadingThread(socketChannel, BUF_SIZE, threadNum));
+            Thread writing = new Thread(new WritingThread(socketChannel, BUF_SIZE, SENDING_RATE, threadNum));
+//            Thread reading = new Thread(new ReadingThread(socketChannel, BUF_SIZE, threadNum));
 
             writing.start();
-            reading.start();
+//            reading.start();
 
             writing.join();
-            reading.join();
+//            reading.join();
         } catch (IOException e) {
             System.out.println("MainClient fail to create socket! : " + e);
         } catch (InterruptedException e) {
@@ -101,10 +101,12 @@ public class DummyThread implements Runnable {
                     return;
 
                 int messageLen = ((readBuffer.get(2) & 0xFF) << 8) | (readBuffer.get(3) & 0xFF);
-               if (readBuffer.position() < messageLen + 4)
-                   return;
+                if (readBuffer.position() < messageLen + 4)
+                    return;
 
-                renderingMessage(textArea, messageLen);
+                readBuffer.clear();
+
+              renderingMessage(textArea, messageLen);
             } catch (IOException e) {
                 System.out.println("MainClient's readThread's messageResolve method : " + e);
             }
@@ -123,68 +125,68 @@ public class DummyThread implements Runnable {
             }
             stringBuilder.append('\n');
             textArea.append(stringBuilder.toString());
-        }
+    }
+}
+
+static class WritingThread implements Runnable {
+    public ByteBuffer writeBuffer;
+    private SocketChannel socketChannel;
+    private final int BYTE_SEC;
+    private final int THREAD_NUM;
+
+    public WritingThread(SocketChannel socketChannel, int bufSize, int byteSec, int threadNum) {
+        this.socketChannel = socketChannel;
+        this.writeBuffer = ByteBuffer.allocate(bufSize);
+        this.BYTE_SEC = byteSec;
+        this.THREAD_NUM = threadNum;
     }
 
-    static class WritingThread implements Runnable {
-        public ByteBuffer writeBuffer;
-        private SocketChannel socketChannel;
-        private final int BYTE_SEC;
-        private final int THREAD_NUM;
-
-        public WritingThread(SocketChannel socketChannel, int bufSize, int byteSec, int threadNum) {
-            this.socketChannel = socketChannel;
-            this.writeBuffer = ByteBuffer.allocate(bufSize);
-            this.BYTE_SEC = byteSec;
-            this.THREAD_NUM = threadNum;
-        }
-
-        @Override
-        public void run() {
-            try {
-                int remainBytes = BYTE_SEC;
-                long destTime = System.currentTimeMillis() + 200;
-                while (true) {
-                    if (System.currentTimeMillis() > destTime) {
-                        destTime += 200;
-                        remainBytes = BYTE_SEC;
-                    }
-                    if (remainBytes > 0) {
-                        int size = fillBuffer(remainBytes);
-                        writeBuffer.flip();
-
-                        int writeByte = 0;
-                        while (writeByte < size) {
-                            writeByte += socketChannel.write(writeBuffer);
-                        }
-                        writeBuffer.clear();
-
-                        remainBytes -= size;
-                    }
+    @Override
+    public void run() {
+        try {
+            int remainBytes = BYTE_SEC;
+            long destTime = System.currentTimeMillis() + 200;
+            while (true) {
+                if (System.currentTimeMillis() > destTime) {
+                    destTime += 200;
+                    remainBytes = BYTE_SEC;
                 }
-            } catch (IOException e) {
-                System.out.println("Writing Thread throw Exception! : " + e);
+                if (remainBytes > 0) {
+                    int size = fillBuffer(remainBytes);
+                    writeBuffer.flip();
+
+                    int writeByte = 0;
+                    while (writeByte < size) {
+                        writeByte += socketChannel.write(writeBuffer);
+                    }
+                    writeBuffer.clear();
+
+                    remainBytes -= size;
+                }
             }
-        }
-
-        // Message protocol
-        // First two bytes => thread's number(ID) / next two bytes => message payload length / else => message payload
-        public int fillBuffer(int messageLen) {
-            fillHeader(messageLen);
-
-            byte tmpChar = (byte) (Math.random() * ('z' - 'A') + 'A');
-            for (int i = 0; i < messageLen; i++) {
-                writeBuffer.put(tmpChar);
-            }
-            return messageLen;
-        }
-
-        // Fill message Header(thread id, messageLen) in writeBuffer
-        public void fillHeader(int messageLen) {
-            writeBuffer.put((byte) (THREAD_NUM >> 8));
-            writeBuffer.put((byte) (THREAD_NUM));
-            writeBuffer.put((byte) (messageLen >> 8));
-            writeBuffer.put((byte) (messageLen));
+        } catch (IOException e) {
+            System.out.println("Writing Thread throw Exception! : " + e);
         }
     }
+
+    // Message protocol
+    // First two bytes => thread's number(ID) / next two bytes => message payload length / else => message payload
+    public int fillBuffer(int messageLen) {
+        fillHeader(messageLen);
+
+        byte tmpChar = (byte) (Math.random() * ('z' - 'A') + 'A');
+        for (int i = 0; i < messageLen; i++) {
+            writeBuffer.put(tmpChar);
+        }
+        return messageLen;
+    }
+
+    // Fill message Header(thread id, messageLen) in writeBuffer
+    public void fillHeader(int messageLen) {
+        writeBuffer.put((byte) (THREAD_NUM >> 8));
+        writeBuffer.put((byte) (THREAD_NUM));
+        writeBuffer.put((byte) (messageLen >> 8));
+        writeBuffer.put((byte) (messageLen));
+    }
+}
 }

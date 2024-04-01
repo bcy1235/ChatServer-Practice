@@ -6,28 +6,20 @@ import utils.Timer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 
 /**
  * class used for checking server performance
  */
 public class MainClient {
-    private static final String SERVER_IP = "127.0.0.1";
+    private static final String SERVER_IP = "192.168.35.38";
     private static final int SERVER_PORT = 40000;
     private static final int BUF_SIZE = 5000;
-    private static final int BYTE_SEC = 300;
+    private static final int sendingRate = 30;
     private static final int THREAD_NUM = 55555;
 
     public static void main(String[] args) {
@@ -38,7 +30,7 @@ public class MainClient {
             socketChannel.configureBlocking(false);
 
 
-            Thread writing = new Thread(new WritingThread(socketChannel, BUF_SIZE, BYTE_SEC, THREAD_NUM));
+            Thread writing = new Thread(new WritingThread(socketChannel, BUF_SIZE, sendingRate, THREAD_NUM));
             Thread reading = new Thread(new ReadingThread(socketChannel, BUF_SIZE, THREAD_NUM));
 
             writing.start();
