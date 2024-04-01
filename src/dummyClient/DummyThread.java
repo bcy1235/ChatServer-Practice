@@ -78,10 +78,10 @@ public class DummyThread implements Runnable {
 
     // Fill message Header(thread id, messageLen) in writeBuffer
     public void fillHeader(int messageLen) {
-        writeBuffer.put((byte) (THREAD_NUM >> 8));
-        writeBuffer.put((byte) (THREAD_NUM));
         writeBuffer.put((byte) (messageLen >> 8));
         writeBuffer.put((byte) (messageLen));
+        writeBuffer.put((byte) (THREAD_NUM >> 8));
+        writeBuffer.put((byte) (THREAD_NUM));
     }
 
 //    static class ReadingThread implements Runnable {

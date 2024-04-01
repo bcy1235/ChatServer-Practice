@@ -45,8 +45,8 @@ public class SendingThread implements Runnable {
                 else if (buffer.position() < 4)
                     return;
 
-                // Message's 3rd and 4th bytes represent message's payload size
-                int messageSize = ((buffer.get(2) & 0xFF) << 8) | (buffer.get(3) & 0xFF);
+                // Message's 1st and 2nd bytes represent message's payload size
+                int messageSize = ((buffer.get(0) & 0xFF) << 8) | (buffer.get(1) & 0xFF);
                 if (buffer.position() < messageSize + 4)
                     return;
 
