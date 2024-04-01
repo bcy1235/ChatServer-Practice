@@ -44,6 +44,11 @@
 
 - 프로세스 4개 / 프로세스당 쓰레드 50개 / 각 쓰레드가 1초에 104Bytes(100 + 4) 전송<br>
 
+https://github.com/bcy1235/ChatServer-Practice/assets/96825479/4896129f-21b0-433f-a08d-f5befe1e965f
 
-
-
+##### (결과)<br>
+Sum : 22.603033(sec)<br>
+Count : 67<br>
+MaxTime : 0.566161(sec)<br>
+MinTime : 0.175369(sec)<br>
+Average : 0.337359(sec)<br><br>
