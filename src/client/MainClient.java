@@ -19,6 +19,7 @@ public class MainClient {
     private static final int BUF_SIZE = 5000;
     private static final int SENDING_RATE = 30;
     private static final int THREAD_NUM = 55555;
+    private static final int INTERVAL = 1000;
 
     public static void main(String[] args) {
         try {
@@ -28,18 +29,15 @@ public class MainClient {
             socketChannel.configureBlocking(false);
 
 
-            Thread writing = new Thread(new WritingThread(socketChannel, BUF_SIZE, SENDING_RATE, THREAD_NUM));
+            Thread writing = new Thread(new WritingThread(socketChannel, BUF_SIZE, SENDING_RATE, THREAD_NUM, INTERVAL));
             Thread reading = new Thread(new ReadingThread(socketChannel, BUF_SIZE, THREAD_NUM));
 
             writing.start();
             reading.start();
 
-            try {
-                writing.join();
-                reading.join();
-            } catch (InterruptedException e) {
-                System.out.println("main method interrupted : " + e);
-            }
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                Timer.makeFile();
+            }));
         } catch (IOException e) {
             System.out.println("MainClient fail to create socket! : " + e);
         }
@@ -64,26 +62,10 @@ public class MainClient {
 
         @Override
         public void run() {
-            TextArea textArea = createBasicGUI();
-            messageResolve(textArea);
+            messageResolve();
         }
 
-        public TextArea createBasicGUI() {
-            JFrame jFrame = new JFrame();
-            jFrame.setSize(BASICGUI_WIDTH, BASICGUI_HEIGHT);
-            // client gui's location is auto, because it is too hard to control gui when invoke many thread
-            jFrame.setLocationByPlatform(true);
-
-            TextArea textArea = new TextArea();
-            JScrollPane scrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-            jFrame.add(scrollPane);
-            jFrame.doLayout();
-            jFrame.setVisible(true);
-            return textArea;
-        }
-
-        public void messageResolve(TextArea textArea) {
+        public void messageResolve() {
             try {
                 while (true) {
                     int readBytes = socketChannel.read(readBuffer);
@@ -102,14 +84,14 @@ public class MainClient {
                     }
 
                     readBuffer.flip();
-                    renderingMessage(textArea, messageLen);
+                    renderingMessage(messageLen);
                 }
             } catch (IOException e) {
                 System.out.println("MainClient's readThread's messageResolve method : " + e);
             }
         }
 
-        public void renderingMessage(TextArea textArea, int messageLen) {
+        public void renderingMessage(int messageLen) {
             byte front = readBuffer.get();
             byte back = readBuffer.get();
             int messageOwner = ((front & 0xFF) << 8) + (back & 0xFF);
@@ -124,7 +106,7 @@ public class MainClient {
             }
             readBuffer.compact();
             stringBuilder.append('\n');
-            textArea.append(stringBuilder.toString());
+            System.out.print(stringBuilder.toString());
             stringBuilder.setLength(0);
         }
     }
@@ -134,12 +116,15 @@ public class MainClient {
         private SocketChannel socketChannel;
         private final int SENDING_RATE;
         private final int THREAD_NUM;
+        private final int INTERVAL;
 
-        public WritingThread(SocketChannel socketChannel, int bufSize, int byteSec, int threadNum) {
+
+        public WritingThread(SocketChannel socketChannel, int bufSize, int byteSec, int threadNum, int interval) {
             this.socketChannel = socketChannel;
             this.writeBuffer = ByteBuffer.allocate(bufSize);
             this.SENDING_RATE = byteSec;
             this.THREAD_NUM = threadNum;
+            this.INTERVAL = interval;
         }
 
         @Override
@@ -155,7 +140,7 @@ public class MainClient {
                     writeBuffer.rewind();
 
                     synchronized (Thread.currentThread()) {
-                        Thread.sleep(1000);
+                        Thread.sleep(INTERVAL);
                     }
                 }
             } catch (IOException e) {

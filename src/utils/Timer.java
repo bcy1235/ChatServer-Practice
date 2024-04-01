@@ -1,5 +1,7 @@
 package utils;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -8,9 +10,16 @@ import java.util.Queue;
  */
 public class Timer {
     private static Queue<Long> start;
+    private static long sum;
+    private static long maxTime;
+    private static long minTime;
+    private static int count;
 
     static {
-            start = new LinkedList<>();
+        start = new LinkedList<>();
+        maxTime = -1;
+        minTime = 0x0FFFFFFFFFFFFFFFL;
+        count = 0;
     }
 
     /**
@@ -27,10 +36,37 @@ public class Timer {
         if (start.isEmpty())
             return false;
 
-        Double timeElapsed = (double) (System.nanoTime() - start.poll()) / 1_000_000_000D;
-        System.out.format("%f (sec)\n", timeElapsed);
+        long nowTime = System.nanoTime() - start.poll();
+
+        maxTime = Math.max(nowTime, maxTime);
+        minTime = Math.min(nowTime, minTime);
+        sum += nowTime;
+        count++;
         return true;
     }
 
+    public static synchronized void makeFile() {
+        try {
+            FileWriter fileWriter = new FileWriter("result.txt", false);
 
+            sum -= (maxTime - minTime);
+            count -= 2;
+            double avg = (double) (sum / (count)) / 1_000_000_000;
+            String output = String.format("" +
+                    "Sum : %f(sec)\n" +
+                    "Count : %d\n" +
+                    "MaxTime : %f(sec)\n" +
+                    "MinTime : %f(sec)\n" +
+                    "Average : %f(sec)"
+                    , (double) sum / 1_000_000_000
+                    , count
+                    , (double) maxTime / 1_000_000_000
+                    , (double) minTime / 1_000_000_000
+                    , avg);
+            fileWriter.write(output);
+            fileWriter.close();
+        } catch (IOException e) {
+            System.out.println("Timer's makeFile method : " + e);
+        }
+    }
 }

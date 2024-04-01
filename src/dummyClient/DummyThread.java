@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.PrimitiveIterator;
 
 public class DummyThread implements Runnable {
     private final String SERVER_IP;
@@ -14,8 +15,10 @@ public class DummyThread implements Runnable {
     private final int THREAD_NUM;
     private final ByteBuffer readBuffer;
     private final ByteBuffer writeBuffer;
+    private final int INTERVAL;
 
-    DummyThread(String serverIp, int serverPort, int bufSize, int sendingRate, int clientPort, int threadNum) {
+
+    DummyThread(String serverIp, int serverPort, int bufSize, int sendingRate, int clientPort, int threadNum, int interval) {
         this.SERVER_IP = serverIp;
         this.SERVER_PORT = serverPort;
         this.SENDING_RATE = sendingRate;
@@ -23,6 +26,7 @@ public class DummyThread implements Runnable {
         this.THREAD_NUM = threadNum;
         this.readBuffer = ByteBuffer.allocate(bufSize);
         this.writeBuffer = ByteBuffer.allocate(bufSize);
+        this.INTERVAL = interval;
     }
 
     @Override
@@ -55,7 +59,7 @@ public class DummyThread implements Runnable {
 
                 // 더 정확하게 1초마다 로직을 돌게하는 방법이 있지만, 쓰레드 효율을 위해 sleep 사용
                 synchronized (Thread.currentThread()) {
-                    Thread.sleep(1000);
+                    Thread.sleep(INTERVAL);
                 }
             }
         } catch (IOException e) {
