@@ -2,7 +2,7 @@ package dummyClient;
 public class DummyProcess {
     private static final String SERVER_IP = "192.168.35.38";
     private static final int SERVER_PORT = 40000;
-    private static final int THREAD_NUM = 60;
+    private static final int THREAD_NUM = 150;
     private static final int BUF_SIZE = 5000;
     // sending rate per each thread
     private static final int sendingRate = 100;

@@ -52,6 +52,7 @@ public class MainClient {
         private final int BASICGUI_HEIGHT;
         private SocketChannel socketChannel;
         private final int THREAD_NUM;
+        private StringBuilder stringBuilder = new StringBuilder();
 
         public ReadingThread(SocketChannel socketChannel, int bufSize, int threadNum) {
             this.readBuffer = ByteBuffer.allocate(bufSize);
@@ -117,7 +118,6 @@ public class MainClient {
                 Timer.checkOver();
             }
 
-            StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("Thread" + messageOwner + ": ");
             for (int i = 4; i < messageLen + 4; i++) {
                 stringBuilder.append((char) readBuffer.get());
@@ -125,6 +125,7 @@ public class MainClient {
             readBuffer.compact();
             stringBuilder.append('\n');
             textArea.append(stringBuilder.toString());
+            stringBuilder.setLength(0);
         }
     }
 
