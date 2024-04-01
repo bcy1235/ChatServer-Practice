@@ -1,5 +1,5 @@
-Sum : 0.254547(sec)
-Count : 56
-MaxTime : 0.005805(sec)
-MinTime : 0.003663(sec)
-Average : 0.004545(sec)
+Sum : 134.552401(sec)
+Count : 49
+MaxTime : 7.015459(sec)
+MinTime : 0.008106(sec)
+Average : 2.745967(sec)

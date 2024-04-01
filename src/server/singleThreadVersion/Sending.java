@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * thread which will be sending message for all SocketChannel
  */
-public class SendingThread implements Runnable {
+public class Sending implements Runnable {
     @Override
     public void run() {
         while (true) {
@@ -54,7 +54,7 @@ public class SendingThread implements Runnable {
                 sendingMessage(ByteBuffer.wrap(bytes));
             } catch (IOException e) {
                 // have to change with logger
-                System.out.println("SendingThread readingMessage method : " + e);
+                System.out.println("Sending readingMessage method : " + e);
                 closeAll(socketChannel);
                 return;
             }
@@ -74,7 +74,7 @@ public class SendingThread implements Runnable {
                 message.rewind();
             }
         } catch (IOException e) {
-            System.out.println("SendingThread sendingMessage method : " + e);
+            System.out.println("Sending sendingMessage method : " + e);
         }
     }
 
@@ -84,7 +84,7 @@ public class SendingThread implements Runnable {
         try {
             socketChannel.close();
         } catch (IOException e) {
-            System.out.println("SendingThread closeAll method : " + e);
+            System.out.println("Sending closeAll method : " + e);
         }
     }
 }

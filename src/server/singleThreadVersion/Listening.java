@@ -15,7 +15,7 @@ public class Listening {
         try {
             ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
             serverSocketChannel.socket().bind(new InetSocketAddress(SERVER_PORT));
-            new Thread(new SendingThread()).start();
+            new Thread(new Sending()).start();
             // actual listening part
 
             while (true) {
