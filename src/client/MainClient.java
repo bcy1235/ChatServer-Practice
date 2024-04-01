@@ -19,7 +19,7 @@ public class MainClient {
     private static final String SERVER_IP = "192.168.35.38";
     private static final int SERVER_PORT = 40000;
     private static final int BUF_SIZE = 5000;
-    private static final int sendingRate = 30;
+    private static final int SENDING_RATE = 30;
     private static final int THREAD_NUM = 55555;
 
     public static void main(String[] args) {
@@ -30,7 +30,7 @@ public class MainClient {
             socketChannel.configureBlocking(false);
 
 
-            Thread writing = new Thread(new WritingThread(socketChannel, BUF_SIZE, sendingRate, THREAD_NUM));
+            Thread writing = new Thread(new WritingThread(socketChannel, BUF_SIZE, SENDING_RATE, THREAD_NUM));
             Thread reading = new Thread(new ReadingThread(socketChannel, BUF_SIZE, THREAD_NUM));
 
             writing.start();
@@ -127,44 +127,36 @@ public class MainClient {
     static class WritingThread implements Runnable {
         public ByteBuffer writeBuffer;
         private SocketChannel socketChannel;
-        private final int BYTE_SEC;
+        private final int SENDING_RATE;
         private final int THREAD_NUM;
 
         public WritingThread(SocketChannel socketChannel, int bufSize, int byteSec, int threadNum) {
             this.socketChannel = socketChannel;
             this.writeBuffer = ByteBuffer.allocate(bufSize);
-            this.BYTE_SEC = byteSec;
+            this.SENDING_RATE = byteSec;
             this.THREAD_NUM = threadNum;
         }
 
         @Override
         public void run() {
             try {
-                int remainBytes = BYTE_SEC;
-                long destTime = System.currentTimeMillis() + 1000;
+                fillBuffer(SENDING_RATE);
+                writeBuffer.flip();
                 while (true) {
-                    if (System.currentTimeMillis() > destTime) {
-                        destTime += 1000;
-                        remainBytes = BYTE_SEC;
+                    Timer.checkStart();
+                    while (writeBuffer.hasRemaining()) {
+                        socketChannel.write(writeBuffer);
                     }
-                    if (remainBytes > 0) {
-                        int size = fillBuffer((int) (remainBytes));
-                        writeBuffer.flip();
+                    writeBuffer.rewind();
 
-                        // time check start
-                        Timer.checkStart();
-
-                        int writeByte = 0;
-                        while (writeByte < size) {
-                            writeByte += socketChannel.write(writeBuffer);
-                        }
-                        writeBuffer.clear();
-
-                        remainBytes -= size;
+                    synchronized (Thread.currentThread()) {
+                        Thread.sleep(1000);
                     }
                 }
             } catch (IOException e) {
-                System.out.println("Writing Thread throw Exception! : " + e);
+                System.out.println("Writing Thread : " + e);
+            } catch (InterruptedException e) {
+                System.out.println("Writing Thread : " + e);
             }
         }
 

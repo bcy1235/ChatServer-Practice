@@ -20,7 +20,6 @@ public class DummyClient {
             });
         }
 
-        System.out.println("Enter any key if you want exit");
-        System.in.read();
+        Thread.sleep(30_000);
     }
 }
