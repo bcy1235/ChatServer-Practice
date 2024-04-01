@@ -67,9 +67,7 @@ public class MainClient {
         @Override
         public void run() {
             TextArea textArea = createBasicGUI();
-            while (true) {
-                messageResolve(textArea);
-            }
+            messageResolve(textArea);
         }
 
         public TextArea createBasicGUI() {
@@ -89,26 +87,28 @@ public class MainClient {
 
         public void messageResolve(TextArea textArea) {
             try {
-                int readBytes = socketChannel.read(readBuffer);
-                if (readBuffer.position() < 4)
-                    return;
+                while (true) {
+                    int readBytes = socketChannel.read(readBuffer);
+                    if (readBuffer.position() < 4)
+                        return;
 
-                int messageLen = ((readBuffer.get(2) & 0xFF) << 8) | (readBuffer.get(3) & 0xFF);
-                if (readBuffer.position() < messageLen + 4)
-                    return;
+                    byte front = readBuffer.get();
+                    byte back = readBuffer.get();
+                    int messageLen = ((front & 0xFF) << 8) | (back & 0xFF);
+                    if (readBuffer.position() < messageLen + 4)
+                        return;
 
-                renderingMessage(textArea, messageLen);
+                    renderingMessage(textArea, messageLen);
+                }
             } catch (IOException e) {
                 System.out.println("MainClient's readThread's messageResolve method : " + e);
             }
         }
 
         public void renderingMessage(TextArea textArea, int messageLen) {
-            ByteBuffer write = resolver.resolve(readBuffer.flip(), messageLen);
-
-            byte[] array = write.array();
-            int messageOwner = ((array[0] & 0xFF) << 8) + (array[1] & 0xFF);
-
+            byte front = readBuffer.get();
+            byte back = readBuffer.get();
+            int messageOwner = ((front & 0xFF) << 8) + (back & 0xFF);
             if (messageOwner == THREAD_NUM) {
                 // time check
                 Timer.checkOver();
@@ -117,8 +117,9 @@ public class MainClient {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("Thread" + messageOwner + ": ");
             for (int i = 4; i < messageLen + 4; i++) {
-                stringBuilder.append((char) array[i]);
+                stringBuilder.append((char) readBuffer.get());
             }
+            readBuffer.compact();
             stringBuilder.append('\n');
             textArea.append(stringBuilder.toString());
         }
