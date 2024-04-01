@@ -1,7 +1,5 @@
 package client;
 
-import utils.MessageResolver;
-import utils.Resolver;
 import utils.Timer;
 
 import javax.swing.*;
@@ -16,7 +14,7 @@ import java.nio.channels.SocketChannel;
  * class used for checking server performance
  */
 public class MainClient {
-    private static final String SERVER_IP = "192.168.35.38";
+    private static final String SERVER_IP = "127.0.0.1";
     private static final int SERVER_PORT = 40000;
     private static final int BUF_SIZE = 5000;
     private static final int SENDING_RATE = 30;
@@ -53,7 +51,6 @@ public class MainClient {
         private final int BASICGUI_WIDTH;
         private final int BASICGUI_HEIGHT;
         private SocketChannel socketChannel;
-        private final Resolver resolver = new MessageResolver();
         private final int THREAD_NUM;
 
         public ReadingThread(SocketChannel socketChannel, int bufSize, int threadNum) {
@@ -95,14 +92,15 @@ public class MainClient {
                     readBuffer.flip();
                     byte front = readBuffer.get();
                     byte back = readBuffer.get();
-                    readBuffer.flip();
+                    readBuffer.compact();
 
                     int messageLen = ((front & 0xFF) << 8) | (back & 0xFF);
-                    if (readBuffer.position() < messageLen + 4) {
+                    if (readBuffer.position() < messageLen + 2) {
                         readBuffer.rewind();
                         continue;
                     }
 
+                    readBuffer.flip();
                     renderingMessage(textArea, messageLen);
                 }
             } catch (IOException e) {

@@ -1,9 +1,6 @@
 package server.singleThreadVersion;
 
 
-import utils.MessageResolver;
-import utils.Resolver;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -15,7 +12,6 @@ import java.util.Set;
  * thread which will be sending message for all SocketChannel
  */
 public class SendingThread implements Runnable {
-    private final Resolver messageResolver = new MessageResolver();
     @Override
     public void run() {
         while (true) {
@@ -35,6 +31,7 @@ public class SendingThread implements Runnable {
 
     public void processingMessage(SocketChannel socketChannel) {
         ByteBuffer buffer = SocketBuffer.getBuffer(socketChannel);
+        byte[] bytes;
         while (true) {
             try {
                 int readBytes = socketChannel.read(buffer);
@@ -50,7 +47,11 @@ public class SendingThread implements Runnable {
                 if (buffer.position() < messageSize + 4)
                     return;
 
-                sendingMessage(messageResolver.resolve(buffer.flip(), messageSize));
+                buffer.flip();
+                buffer.get( bytes = new byte[messageSize + 4], 0, messageSize + 4);
+                buffer.compact();
+
+                sendingMessage(ByteBuffer.wrap(bytes));
             } catch (IOException e) {
                 // have to change with logger
                 System.out.println("SendingThread readingMessage method : " + e);
