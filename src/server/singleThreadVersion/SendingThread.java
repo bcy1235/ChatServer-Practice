@@ -48,7 +48,7 @@ public class SendingThread implements Runnable {
                     return;
 
                 buffer.flip();
-                buffer.get( bytes = new byte[messageSize + 4], 0, messageSize + 4);
+                buffer.get(bytes = new byte[messageSize + 4], 0, messageSize + 4);
                 buffer.compact();
 
                 sendingMessage(ByteBuffer.wrap(bytes));
@@ -74,7 +74,6 @@ public class SendingThread implements Runnable {
                 message.rewind();
             }
         } catch (IOException e) {
-            // have to change with logger
             System.out.println("SendingThread sendingMessage method : " + e);
         }
     }
@@ -85,7 +84,6 @@ public class SendingThread implements Runnable {
         try {
             socketChannel.close();
         } catch (IOException e) {
-            // have to change with logger
             System.out.println("SendingThread closeAll method : " + e);
         }
     }

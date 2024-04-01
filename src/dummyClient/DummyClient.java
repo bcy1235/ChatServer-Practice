@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class DummyClient {
-    private static int PROCESS_NUM = 1;
+    private static int PROCESS_NUM = 4;
     public static void main(String[] args) throws IOException, InterruptedException {
 
         for (int i = 0; i < PROCESS_NUM; i++) {
@@ -20,6 +20,7 @@ public class DummyClient {
             });
         }
 
-        Thread.sleep(30_000);
+        System.out.println("Enter Any Key");
+        System.in.read();
     }
 }

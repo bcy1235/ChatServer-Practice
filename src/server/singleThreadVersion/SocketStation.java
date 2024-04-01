@@ -23,7 +23,6 @@ public class SocketStation {
             selector = Selector.open();
             list = new LinkedList<>();
         } catch (IOException e) {
-            // have to change with logger
             System.out.println("SocketStation static block : " + e);
         }
     }
@@ -38,7 +37,6 @@ public class SocketStation {
             socketChannel.register(selector, SelectionKey.OP_READ);
             list.add(socketChannel);
         } catch (ClosedChannelException e) {
-            // have to change with logger
             System.out.println("SocketStation register method : " + e);
         }
     }
@@ -55,7 +53,6 @@ public class SocketStation {
                 return selector.selectedKeys();
             }
         } catch (IOException e) {
-            // have to change with logger
             System.out.println("SocketStation getValidKey method : " + e);
         }
         return null;

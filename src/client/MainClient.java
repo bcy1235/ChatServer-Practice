@@ -14,7 +14,7 @@ import java.nio.channels.SocketChannel;
  * class used for checking server performance
  */
 public class MainClient {
-    private static final String SERVER_IP = "192.168.35.38";
+    private static final String SERVER_IP = "127.0.0.1";
     private static final int SERVER_PORT = 40000;
     private static final int BUF_SIZE = 5000;
     private static final int SENDING_RATE = 30;

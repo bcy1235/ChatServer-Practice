@@ -2,14 +2,12 @@ package server.singleThreadVersion;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
 /**
  * main thread Waiting for new connection
  */
-
 public class Listening {
     private static int SERVER_PORT = 40000;
     private static int BUF_SIZE = 3000;
@@ -28,7 +26,6 @@ public class Listening {
                 SocketStation.register(connectedChannel);
             }
         } catch (IOException e) {
-            // have to change with logger
             System.out.println("Listening main method : " + e);
         }
     }

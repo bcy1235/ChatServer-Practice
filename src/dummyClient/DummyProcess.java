@@ -1,8 +1,8 @@
 package dummyClient;
 public class DummyProcess {
-    private static final String SERVER_IP = "192.168.35.38";
+    private static final String SERVER_IP = "127.0.0.1";
     private static final int SERVER_PORT = 40000;
-    private static final int THREAD_NUM = 100;
+    private static final int THREAD_NUM = 50;
     private static final int BUF_SIZE = 5000;
     // sending rate per each thread
     private static final int SENDING_RATE = 100;
