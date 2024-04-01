@@ -27,7 +27,7 @@ public class MainClient {
     private static final String SERVER_IP = "127.0.0.1";
     private static final int SERVER_PORT = 40000;
     private static final int BUF_SIZE = 5000;
-    private static final int BYTE_SEC = 1024;
+    private static final int BYTE_SEC = 300;
     private static final int THREAD_NUM = 55555;
 
     public static void main(String[] args) {
@@ -149,10 +149,10 @@ public class MainClient {
         public void run() {
             try {
                 int remainBytes = BYTE_SEC;
-                long destTime = System.currentTimeMillis() + 200;
+                long destTime = System.currentTimeMillis() + 1000;
                 while (true) {
                     if (System.currentTimeMillis() > destTime) {
-                        destTime += 200;
+                        destTime += 1000;
                         remainBytes = BYTE_SEC;
                     }
                     if (remainBytes > 0) {
