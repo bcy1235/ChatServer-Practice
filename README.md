@@ -1,7 +1,5 @@
-# ChatServer-Practice
 
 간단한 채팅 서버를 만든 후, 성능을 측정하고, 개선해보는 프로젝트입니다.<br><br>
-
 --- 
 ### 메시지 구조
 맨 앞부터의 메시지 구성 요소를 설명합니다.<br><br>
@@ -139,4 +137,44 @@ Count : 39<br>
 MaxTime : 5.097860(sec)<br>
 MinTime : 0.382470(sec)<br>
 Average : 2.945270(sec)<br><br>
+
+
+- 쓰레드 풀 크기 : 30
+- 프로세스 14개 / 각 쓰레드 50개 / 1초에 104bytes 전송
+
+Sum : 1.785475(sec)<br>
+Count : 42<br>
+MaxTime : 0.319820(sec)<br>
+MinTime : 0.008979(sec)<br>
+Average : 0.042511(sec)<br><br>
+
+---
+### 문제 발생
+
+멀티쓰레드 버전 서버 성능 측정 도중, 갑자기 MainClient가 멈추는 현상 발생.<br>
+
+작업관리자로 확인해보니, 서버의 메모리가 계속해서 증가(대략 1초에 MB 단위)하는 현상 관찰. 인텔리제이로 디버깅 모드를 실행한 다음, 메모리가 어느정도 증가했을때의 상태를 확인해보겠음.<br>
+
+![image](https://github.com/bcy1235/ChatServer-Practice/assets/96825479/16671a92-2b66-4414-ac53-005c91d55f08)
+
+
+104bytes * 94051 => 9.7MB<br>
+적은 숫자는 아니지만, 초당 2MB 증가했던 점을 생각하면 그렇게 큰 용량은 아님.<br><br>
+
+찾아보던중, 충격적인 사실 발견; SocketStaion의 list의 크기가 내가 연결 목표로 했던 소켓 채널 개수보다 더 적다는 사실을 알아챔.<br><br>
+
+![image](https://github.com/bcy1235/ChatServer-Practice/assets/96825479/bfb28da2-dd4d-486c-b984-74f78070c7e5)
+
+(목표로 했던 리스트의 크기는 500)
+
+현재 발생한 문제는 2가지.
+
+- 서버의 메모리가 지속적으로 증가하는 현상 (TaskQueue가 빔에도 지속적으로 메모리가 MB 단위로 증가함)
+- 내가 목표했던 DummyThread의 수보다 더 적은 쓰레드가 서버와 연결됨.
+
+
+
+
+
+
 
