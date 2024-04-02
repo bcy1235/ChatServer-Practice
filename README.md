@@ -98,11 +98,45 @@ SingleThreadVersion과의 차이점을 중심으로 설명하겠습니다.
 - 쓰레드 풀의 크기가 현재 점유 가능한 코어의 개수보다 너무 크다면, 컨텍스트 스위칭에 드는 비용이 상대적으로 증가할 것입니다.
 - 반대로 쓰레드 풀의 크기가 너무 작다면, 코어를 완전히 사용하지 못해 효율적인 서버라고 보기 힘들것입니다.<br>
 
-따라서, 개수를 적절하게 조절하여 현재 실행 환경에 맞는 최적의 개수를 찾는 것이 중요하다고 생각됩니다.
+따라서, 개수를 적절하게 조절하여 현재 실행 환경에 맞는 최적의 개수를 찾는 것이 중요하다고 생각됩니다.<br>
 
 
 - 쓰레드 풀 크기 : 5
 - 프로세스 10개 / 각 쓰레드 50개 / 1초에 104bytes 전송
+  
+https://github.com/bcy1235/ChatServer-Practice/assets/96825479/7beff7e3-f6b5-4e4f-9ed8-64c02539bcd0
 
+Sum : 336.955133(sec)<br>
+Count : 39<br>
+MaxTime : 16.597610(sec)<br>
+MinTime : 0.464432(sec)<br>
+Average : 8.639875(sec)<br><br>
 
+(영상 생략)<br>
+- 쓰레드 풀 크기 : 10
+- 프로세스 10개 / 각 쓰레드 50개 / 1초에 104bytes 전송
+  
+Sum : 87.897608(sec)<br>
+Count : 38<br>
+MaxTime : 4.231894(sec)<br>
+MinTime : 0.229595(sec)<br>
+Average : 2.313095(sec)<br><br>
+
+- 쓰레드 풀 크기 : 20
+- 프로세스 10개 / 각 쓰레드 50개 / 1초에 104bytes 전송
+
+Sum : 0.530368(sec)<br>
+Count : 55<br>
+MaxTime : 0.011398(sec)<br>
+MinTime : 0.007019(sec)<br>
+Average : 0.009643(sec)<br><br>
+
+- 쓰레드 풀 크기 : 20
+- 프로세스 14개 / 각 쓰레드 50개 / 1초에 104bytes 전송
+
+Sum : 114.865532(sec)<br>
+Count : 39<br>
+MaxTime : 5.097860(sec)<br>
+MinTime : 0.382470(sec)<br>
+Average : 2.945270(sec)<br><br>
 
