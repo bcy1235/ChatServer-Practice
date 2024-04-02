@@ -1,4 +1,4 @@
-package server.singleThreadVersion;
+package server.multiThreadVersion;
 
 
 import java.io.IOException;
