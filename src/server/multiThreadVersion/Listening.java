@@ -14,6 +14,7 @@ public class Listening {
 
     public static void main(String[] args) {
         try {
+            ProcessThreadPool.initialize();
             ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
             serverSocketChannel.socket().bind(new InetSocketAddress(SERVER_PORT));
             new Thread(new Reading()).start();
@@ -21,10 +22,13 @@ public class Listening {
             // actual listening part
             while (true) {
                 SocketChannel connectedChannel = serverSocketChannel.accept();
-                connectedChannel.configureBlocking(false);
+                if (connectedChannel == null)
+                    continue;
 
+                connectedChannel.configureBlocking(false);
                 SocketBuffer.insert(connectedChannel, BUF_SIZE);
-                SocketStation.register(connectedChannel);
+                SocketStation.registerSelector(connectedChannel);
+                SocketStation.registerList(connectedChannel);
             }
         } catch (IOException e) {
             System.out.println("Listening main method : " + e);

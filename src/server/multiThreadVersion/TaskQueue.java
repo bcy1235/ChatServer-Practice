@@ -28,7 +28,4 @@ public class TaskQueue {
             return queue.poll();
     }
 
-    public static synchronized boolean isEmpty() {
-        return queue.isEmpty();
-    }
 }

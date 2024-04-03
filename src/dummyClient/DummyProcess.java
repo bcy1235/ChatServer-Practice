@@ -11,7 +11,10 @@ public class DummyProcess {
     public static void main(String[] args) throws InterruptedException {
         int processNumber = Integer.parseInt(args[0]);
         for (int i = processNumber * THREAD_NUM; i < processNumber * THREAD_NUM + THREAD_NUM; i++) {
-            new Thread(new DummyThread(SERVER_IP, SERVER_PORT, BUF_SIZE, SENDING_RATE, 15000 + i, i, INTERVAL)).start();
+            Thread thread = new Thread(new DummyThread(SERVER_IP, SERVER_PORT, BUF_SIZE, SENDING_RATE, 20000 + i, i, INTERVAL));
+            while (thread.getState() == Thread.State.NEW) {
+                thread.start();
+            }
         }
     }
 }

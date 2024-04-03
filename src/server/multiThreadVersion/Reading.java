@@ -14,7 +14,6 @@ import java.util.Set;
 public class Reading implements Runnable {
     @Override
     public void run() {
-        new Thread(new Detecting()).start();
         while (true) {
             Set<SelectionKey> validKey = SocketStation.getValidKey();
             if (validKey == null)
@@ -61,22 +60,13 @@ public class Reading implements Runnable {
     }
 
     public void closeAll(SocketChannel socketChannel) {
-        SocketStation.delete(socketChannel);
+        SocketStation.deleteFromList(socketChannel);
+        SocketStation.deleteFromSelector(socketChannel);
         SocketBuffer.delete(socketChannel);
         try {
             socketChannel.close();
         } catch (IOException e) {
             System.out.println("Sending closeAll method : " + e);
-        }
-    }
-
-    public class Detecting implements Runnable{
-        @Override
-        public void run() {
-            while (true) {
-                if (!TaskQueue.isEmpty())
-                    ProcessThreadPool.wakeUp();
-            }
         }
     }
 }

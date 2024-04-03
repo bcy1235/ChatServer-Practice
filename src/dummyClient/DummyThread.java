@@ -1,22 +1,24 @@
 package dummyClient;
 
+import server.multiThreadVersion.SocketStation;
+
 import java.io.*;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.PrimitiveIterator;
 
 public class DummyThread implements Runnable {
     private final String SERVER_IP;
     private final int SERVER_PORT;
-//    private final int BUF_SIZE;
+    //    private final int BUF_SIZE;
     private final int SENDING_RATE;
     private final int CLIENT_PORT;
     private final int THREAD_NUM;
     private final ByteBuffer readBuffer;
     private final ByteBuffer writeBuffer;
     private final int INTERVAL;
-
 
     DummyThread(String serverIp, int serverPort, int bufSize, int sendingRate, int clientPort, int threadNum, int interval) {
         this.SERVER_IP = serverIp;
@@ -33,9 +35,21 @@ public class DummyThread implements Runnable {
     public void run() {
         try {
             SocketChannel socketChannel = SocketChannel.open();
+            socketChannel.configureBlocking(false);
+
+            Selector selector = Selector.open();
+            socketChannel.register(selector, SelectionKey.OP_CONNECT);
             socketChannel.bind(new InetSocketAddress(CLIENT_PORT));
             socketChannel.connect(new InetSocketAddress(SERVER_IP, SERVER_PORT));
-            socketChannel.configureBlocking(false);
+            while (selector.selectNow() == 0) {
+            }
+            SocketChannel channel = (SocketChannel) selector.selectedKeys().iterator().next().channel();
+
+            while (!channel.finishConnect()) {
+
+            }
+
+            Thread.sleep(1000);
 
 //            Thread writing = new Thread(new WritingThread(socketChannel, BUF_SIZE, SENDING_RATE, threadNum));
 //            Thread reading = new Thread(new ReadingThread(socketChannel, BUF_SIZE, threadNum));
@@ -68,6 +82,7 @@ public class DummyThread implements Runnable {
             System.out.println("MainClient get interrupted! : " + e);
         }
     }
+
     // Message protocol
     // First two bytes => thread's number(ID) / next two bytes => message payload length / else => message payload
     public int fillBuffer(int messageLen) {
