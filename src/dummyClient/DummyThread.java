@@ -8,6 +8,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.PrimitiveIterator;
+import java.util.WeakHashMap;
 
 public class DummyThread implements Runnable {
     private final String SERVER_IP;
@@ -37,19 +38,12 @@ public class DummyThread implements Runnable {
             SocketChannel socketChannel = SocketChannel.open();
             socketChannel.configureBlocking(false);
 
-            Selector selector = Selector.open();
-            socketChannel.register(selector, SelectionKey.OP_CONNECT);
             socketChannel.bind(new InetSocketAddress(CLIENT_PORT));
             socketChannel.connect(new InetSocketAddress(SERVER_IP, SERVER_PORT));
-            while (selector.selectNow() == 0) {
-            }
-            SocketChannel channel = (SocketChannel) selector.selectedKeys().iterator().next().channel();
 
-            while (!channel.finishConnect()) {
+            while (!socketChannel.finishConnect()) {
 
             }
-
-            Thread.sleep(1000);
 
 //            Thread writing = new Thread(new WritingThread(socketChannel, BUF_SIZE, SENDING_RATE, threadNum));
 //            Thread reading = new Thread(new ReadingThread(socketChannel, BUF_SIZE, threadNum));
