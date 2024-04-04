@@ -1,11 +1,9 @@
 package server.newMultiThreadVersion;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-public class MessageStation {
-    private static ConcurrentLinkedQueue<byte[]> concurrentLinkedQueue;
-    private static final int COLLECTOR_NUM = 1;
-    private static final int SPLITTER_NUM = 5;
+    public class MessageStation {
+        private static ConcurrentLinkedQueue<byte[]> concurrentLinkedQueue;
+        private static final int COLLECTOR_NUM = 1;
+        private static final int SPLITTER_NUM = 5;
 
     public static void start() {
         concurrentLinkedQueue = new ConcurrentLinkedQueue<>();

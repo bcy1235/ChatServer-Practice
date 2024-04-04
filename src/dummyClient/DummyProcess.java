@@ -1,6 +1,6 @@
 package dummyClient;
 public class DummyProcess {
-    private static final String SERVER_IP = "127.0.0.1";
+    private static final String SERVER_IP = "192.168.35.184";
     private static final int SERVER_PORT = 40000;
     private static final int THREAD_NUM = 50;
     private static final int BUF_SIZE = 5000;
