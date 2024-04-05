@@ -18,7 +18,7 @@ public class WritingBox {
     static {
         socketRoomList = new LinkedList<>();
         messageQueueList = new ConcurrentLinkedDeque<>();
-        ROOM_SIZE = 100;
+        ROOM_SIZE = 30;
     }
 
     public static void push(byte[] message) {

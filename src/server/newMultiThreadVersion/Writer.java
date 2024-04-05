@@ -24,6 +24,11 @@ public class Writer implements Runnable {
             ByteBuffer byteBuffer = null;
             byteBuffer = messageQueue.poll();
             if (byteBuffer == null) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    System.out.println("Writer run method : " + e);
+                }
                 continue;
             }
             sendingMessage(byteBuffer);

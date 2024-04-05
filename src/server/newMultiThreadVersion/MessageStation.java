@@ -3,7 +3,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
     public class MessageStation {
         private static ConcurrentLinkedQueue<byte[]> concurrentLinkedQueue;
         private static final int COLLECTOR_NUM = 1;
-        private static final int SPLITTER_NUM = 5;
+        private static final int SPLITTER_NUM = 1;
 
     public static void start() {
         concurrentLinkedQueue = new ConcurrentLinkedQueue<>();
@@ -29,6 +29,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
         public void run() {
             while (true) {
                 byte[] message;
+                if (concurrentLinkedQueue.isEmpty())
+                    continue;
+
                 message = concurrentLinkedQueue.poll();
                 if (message == null)
                     continue;

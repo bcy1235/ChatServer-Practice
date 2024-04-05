@@ -18,13 +18,17 @@ public class ReadingBox {
         socketRoomList = new LinkedList<>();
         queueConcurrentLinkedDeque = new ConcurrentLinkedDeque<>();
 //        threadList = new LinkedList<>();
-        ROOM_SIZE = 1000;
+        ROOM_SIZE = 5000;
     }
 
     public static void getMessage(ConcurrentLinkedQueue concurrentLinkedQueue) {
         Iterator<ConcurrentLinkedQueue<byte[]>> iterator = queueConcurrentLinkedDeque.iterator();
         while (iterator.hasNext()) {
-            byte[] bytes = iterator.next().poll();
+            ConcurrentLinkedQueue<byte[]> queue = iterator.next();
+            if (queue.isEmpty())
+                continue;
+
+            byte[] bytes = queue.poll();
             if (bytes == null)
                 continue;
             concurrentLinkedQueue.add(bytes);

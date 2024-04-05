@@ -23,6 +23,11 @@ public class Reader implements Runnable {
             Set<SelectionKey> validKey;
             validKey = socketRoom.getValidKey();
             if (validKey == null) {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    System.out.println("Reader run method : " + e);
+                }
                 continue;
             }
 
@@ -31,16 +36,12 @@ public class Reader implements Runnable {
                 SocketChannel socketChannel = (SocketChannel) iterator.next().channel();
                 iterator.remove();
 
-                byte[] bytes = processingMessage(socketChannel);
-                if (bytes == null)
-                    continue;
-
-                queue.add(bytes);
+                processingMessage(socketChannel);
             }
         }
     }
 
-    public byte[] processingMessage(SocketChannel socketChannel) {
+    public void processingMessage(SocketChannel socketChannel) {
         ByteBuffer buffer = SocketBuffer.getBuffer(socketChannel);
         byte[] bytes;
         while (true) {
@@ -48,24 +49,24 @@ public class Reader implements Runnable {
                 int readBytes = socketChannel.read(buffer);
                 if (readBytes == -1) {
                     closeAll(socketChannel);
-                    return null;
+                    return;
                 } else if (buffer.position() < 4)
-                    return null;
+                    return;
 
                 // Message's 1st and 2nd bytes represent message's payload size
                 int messageSize = ((buffer.get(0) & 0xFF) << 8) | (buffer.get(1) & 0xFF);
                 if (buffer.position() < messageSize + 4)
-                    return null;
+                    return;
 
                 buffer.flip();
                 buffer.get(bytes = new byte[messageSize + 4], 0, messageSize + 4);
                 buffer.compact();
 
-                return bytes;
+                queue.add(bytes);
             } catch (IOException e) {
                 System.out.println("Reader processingMessage method : " + e);
                 closeAll(socketChannel);
-                return null;
+                return;
             }
         }
     }
