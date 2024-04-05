@@ -1,4 +1,4 @@
-package server.singleThreadVersion;
+package server.multiThreadVersion;
 
 
 import java.io.IOException;
@@ -31,12 +31,19 @@ public class SocketStation {
      *
      * @param socketChannel which is registered to Selector
      */
-    public static synchronized void register(SocketChannel socketChannel) {
-        try {
-            socketChannel.register(selector, SelectionKey.OP_READ);
+    public static void registerList(SocketChannel socketChannel) {
+        synchronized (list) {
             list.add(socketChannel);
-        } catch (ClosedChannelException e) {
-            System.out.println("SocketStation register method : " + e);
+        }
+    }
+
+    public static void registerSelector(SocketChannel socketChannel) {
+        synchronized (selector) {
+            try {
+                socketChannel.register(selector, SelectionKey.OP_READ);
+            } catch (ClosedChannelException e) {
+                System.out.println("SocketStation register method : " + e);
+            }
         }
     }
 
@@ -46,7 +53,7 @@ public class SocketStation {
      *
      * @return valid Selection Key's set. if return value is null, unexpected situation is occurred
      */
-    public static synchronized Set<SelectionKey> getValidKey() {
+    public static Set<SelectionKey> getValidKey() {
         try {
             while (selector.selectNow() != 0) {
                 return selector.selectedKeys();
@@ -60,15 +67,24 @@ public class SocketStation {
     /**
      * @return SocketChannel List
      */
-    public static synchronized List<SocketChannel> getSocketList() {
-        return List.copyOf(list);
+    public static List<SocketChannel> getSocketList() {
+        synchronized (list) {
+            return List.copyOf(list);
+        }
     }
 
     /**
      * @param socketChannel be removed from SocketStation Management
      */
-    public static synchronized void delete(SocketChannel socketChannel) {
-        socketChannel.keyFor(selector).cancel();
-        list.remove(socketChannel);
+    public static void deleteFromSelector(SocketChannel socketChannel) {
+        synchronized (selector) {
+            socketChannel.keyFor(selector).cancel();
+        }
+    }
+
+    public static void deleteFromList(SocketChannel socketChannel) {
+        synchronized (list) {
+            list.remove(socketChannel);
+        }
     }
 }
