@@ -2,8 +2,6 @@ package client;
 
 import utils.Timer;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -36,7 +34,7 @@ public class MainClient {
             reading.start();
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                Timer.makeFile();
+                Timer.makeResultFile();
             }));
         } catch (IOException e) {
             System.out.println("MainClient fail to create socket! : " + e);
@@ -46,16 +44,12 @@ public class MainClient {
 
     static class ReadingThread implements Runnable {
         public ByteBuffer readBuffer;
-        private final int BASICGUI_WIDTH;
-        private final int BASICGUI_HEIGHT;
         private SocketChannel socketChannel;
         private final int THREAD_NUM;
         private StringBuilder stringBuilder = new StringBuilder();
 
         public ReadingThread(SocketChannel socketChannel, int bufSize, int threadNum) {
             this.readBuffer = ByteBuffer.allocate(bufSize);
-            this.BASICGUI_WIDTH = 300;
-            this.BASICGUI_HEIGHT = 300;
             this.socketChannel = socketChannel;
             this.THREAD_NUM = threadNum;
         }
@@ -68,7 +62,7 @@ public class MainClient {
         public void messageResolve() {
             try {
                 while (true) {
-                    int readBytes = socketChannel.read(readBuffer);
+                    socketChannel.read(readBuffer);
                     if (readBuffer.position() < 4)
                         continue;
 
@@ -97,7 +91,7 @@ public class MainClient {
             int messageOwner = ((front & 0xFF) << 8) + (back & 0xFF);
             if (messageOwner == THREAD_NUM) {
                 // time check
-                Timer.checkOver();
+                Timer.timerStop();
             }
 
             stringBuilder.append("Thread" + messageOwner + ": ");
@@ -133,7 +127,7 @@ public class MainClient {
                 fillBuffer(SENDING_RATE);
                 writeBuffer.flip();
                 while (true) {
-                    Timer.checkStart();
+                    Timer.timerStart();
                     while (writeBuffer.hasRemaining()) {
                         socketChannel.write(writeBuffer);
                     }

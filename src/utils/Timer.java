@@ -25,14 +25,14 @@ public class Timer {
     /**
      * used when you want to check performance code area where in front of start entry point
      */
-    public static synchronized void checkStart() {
+    public static synchronized void timerStart() {
         start.add(System.nanoTime());
     }
 
     /**
      * @return if you didn't invoke checkStart() then return false, else true
      */
-    public static synchronized boolean checkOver() {
+    public static synchronized boolean timerStop() {
         if (start.isEmpty())
             return false;
 
@@ -45,7 +45,10 @@ public class Timer {
         return true;
     }
 
-    public static synchronized void makeFile() {
+    /**
+     * make Timer result file in now directory
+     */
+    public static synchronized void makeResultFile() {
         try {
             FileWriter fileWriter = new FileWriter("result.txt", false);
 
@@ -53,11 +56,11 @@ public class Timer {
             count -= 2;
             double avg = (double) (sum / (count)) / 1_000_000_000;
             String output = String.format("" +
-                    "Sum : %f(sec)\n" +
-                    "Count : %d\n" +
-                    "MaxTime : %f(sec)\n" +
-                    "MinTime : %f(sec)\n" +
-                    "Average : %f(sec)"
+                            "Sum : %f(sec)\n" +
+                            "Count : %d\n" +
+                            "MaxTime : %f(sec)\n" +
+                            "MinTime : %f(sec)\n" +
+                            "Average : %f(sec)"
                     , (double) sum / 1_000_000_000
                     , count
                     , (double) maxTime / 1_000_000_000

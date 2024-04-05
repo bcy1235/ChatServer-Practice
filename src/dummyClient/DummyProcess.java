@@ -8,7 +8,7 @@ public class DummyProcess {
     private static final int SENDING_RATE = 100;
     // (ms)
     private static final int INTERVAL = 1000;
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         int processNumber = Integer.parseInt(args[0]);
         for (int i = processNumber * THREAD_NUM; i < processNumber * THREAD_NUM + THREAD_NUM; i++) {
             Thread thread = new Thread(new DummyThread(SERVER_IP, SERVER_PORT, BUF_SIZE, SENDING_RATE, 20000 + i, i));

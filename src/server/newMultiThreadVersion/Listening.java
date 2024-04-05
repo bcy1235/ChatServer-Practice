@@ -15,7 +15,6 @@ import java.util.Set;
  * main thread Waiting for new connection
  */
 public class Listening {
-    private static Queue<SocketChannel> queue = new LinkedList<>();
     private static int SERVER_PORT = 40000;
     private static int BUF_SIZE = 3000;
 

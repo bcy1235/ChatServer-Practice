@@ -6,18 +6,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class ReadingBox {
     private static List<SocketRoom> socketRoomList;
     private static ConcurrentLinkedDeque<ConcurrentLinkedQueue<byte[]>> queueConcurrentLinkedDeque;
-    //    private static List<Thread> threadList;
     private static int ROOM_SIZE;
 
     static {
         socketRoomList = new LinkedList<>();
         queueConcurrentLinkedDeque = new ConcurrentLinkedDeque<>();
-//        threadList = new LinkedList<>();
         ROOM_SIZE = 5000;
     }
 
@@ -63,7 +60,6 @@ public class ReadingBox {
         ConcurrentLinkedQueue<byte[]> queue = new ConcurrentLinkedQueue<>();
         queueConcurrentLinkedDeque.add(queue);
         Thread readingThread = new Thread(new Reader(room, queue));
-//        threadList.add(readingThread);
         readingThread.start();
     }
 }

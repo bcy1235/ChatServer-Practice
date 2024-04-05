@@ -56,7 +56,6 @@ public class WritingBox {
         ConcurrentLinkedQueue<ByteBuffer> queue = new ConcurrentLinkedQueue<>();
         messageQueueList.add(queue);
         Thread writingThread = new Thread(new Writer(room, queue));
-//        threadList.add(readingThread);
         writingThread.start();
     }
 }
