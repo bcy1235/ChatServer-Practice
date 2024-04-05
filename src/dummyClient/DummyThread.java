@@ -16,7 +16,6 @@ public class DummyThread implements Runnable {
     private final int SENDING_RATE;
     private final int CLIENT_PORT;
     private final int THREAD_NUM;
-    private final int BUF_SIZE;
     private final ByteBuffer writeBuffer;
     private final ByteBuffer readBuffer;
 
@@ -26,7 +25,6 @@ public class DummyThread implements Runnable {
         this.SENDING_RATE = sendingRate;
         this.CLIENT_PORT = clientPort;
         this.THREAD_NUM = threadNum;
-        this.BUF_SIZE = bufSize;
         writeBuffer = ByteBuffer.allocate(200);
         readBuffer = ByteBuffer.allocate(bufSize);
     }
