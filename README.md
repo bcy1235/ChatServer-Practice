@@ -12,7 +12,7 @@
 ---
 ### SingleThreadVersion 서버 구조
 싱글스레드 서버는 다음 요소들로 구성됩니다.
-
+![singleServer.png](image%2FsingleServer.png)
 - Listening<br><br>
 &nbsp;서버에 들어오는 연결 요청을 기다립니다. 연결이 맺어질 경우, SocketStation과 SocketBuffer에 해당 소켓 채널을 등록합니다.<br><br>
 - SocketStation<br><br>
